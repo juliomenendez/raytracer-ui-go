@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"runtime"
 
 	wde "github.com/skelterjohn/go.wde"
@@ -18,15 +19,19 @@ func main() {
 }
 
 func runUI() {
-	size := 400
-	window, err := wde.NewWindow(size, size)
+	width := 600
+	height := 400
+	window, err := wde.NewWindow(width, height)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	window.SetTitle("RayTracer in Golang")
-	window.SetSize(size, size)
+	window.SetSize(width, height)
 	window.Show()
+
+	draw(window.Screen(), width, height)
+	window.FlushImage()
 
 	events := window.EventChan()
 
@@ -42,4 +47,19 @@ func runUI() {
 			}
 		}
 	}()
+}
+
+func draw(im wde.Image, width, height int) {
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			r := toRGBColorComponent(float64(x) / float64(width))
+			g := toRGBColorComponent(float64(y) / float64(height))
+			b := toRGBColorComponent(0.2)
+			im.Set(x, y, color.RGBA{r, g, b, 255})
+		}
+	}
+}
+
+func toRGBColorComponent(value float64) uint8 {
+	return uint8(255.99 * value)
 }
