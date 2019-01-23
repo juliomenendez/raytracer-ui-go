@@ -73,7 +73,19 @@ func draw(im wde.Image, width, height int) {
 }
 
 func getColor(ray Ray) r3.Vector {
+	if hitSphere(r3.Vector{X: 0, Y: 0, Z: -1}, 0.5, ray) {
+		return r3.Vector{X: 1, Y: 0, Z: 0}
+	}
 	unitDirection := ray.direction.Normalize()
 	t := 0.5 * (unitDirection.Y + 1.0)
 	return r3.Vector{X: 1.0, Y: 1.0, Z: 1.0}.Mul(1.0 - t).Add(r3.Vector{X: 0.5, Y: 0.7, Z: 1.0}.Mul(t))
+}
+
+func hitSphere(center r3.Vector, radius float64, ray Ray) bool {
+	originCenter := ray.direction.Sub(center)
+	i := ray.direction.Dot(ray.direction)
+	j := originCenter.Dot(ray.direction) * 2.0
+	z := originCenter.Dot(originCenter) - radius*radius
+	discriminant := j*j - 4*i*z
+	return discriminant > 0
 }
