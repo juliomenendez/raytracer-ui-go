@@ -5,6 +5,8 @@ import (
 	"image/color"
 	"runtime"
 
+	"github.com/golang/geo/r3"
+
 	wde "github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/init"
 )
@@ -50,16 +52,16 @@ func runUI() {
 }
 
 func draw(im wde.Image, width, height int) {
-	for x := 0; x < width; x++ {
-		for y := 0; y < height; y++ {
-			r := toRGBColorComponent(float64(x) / float64(width))
-			g := toRGBColorComponent(float64(y) / float64(height))
-			b := toRGBColorComponent(0.2)
-			im.Set(x, y, color.RGBA{r, g, b, 255})
+	bounds := im.Bounds()
+	baseColor := 255.99
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			rgbVector := r3.Vector{X: float64(x) / float64(width), Y: float64(y) / float64(height), Z: 0.2}
+			rgbColor := color.RGBA{
+				uint8(baseColor * rgbVector.X),
+				uint8(baseColor * rgbVector.Y),
+				uint8(baseColor * rgbVector.Z), 255}
+			im.Set(x, y, rgbColor)
 		}
 	}
-}
-
-func toRGBColorComponent(value float64) uint8 {
-	return uint8(255.99 * value)
 }
